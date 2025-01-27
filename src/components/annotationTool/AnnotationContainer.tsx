@@ -1,4 +1,4 @@
-import { Layer, Stage } from "react-konva";
+import { Circle, Layer, Stage } from "react-konva";
 import ImageContainer from "./ImageContainer";
 import { useState } from "react";
 import Reactangle from "./shapes/Reactangle";
@@ -27,7 +27,6 @@ const AnnotationContainer = ({
         width={width}
         height={height}
         className=" shadow-lg flex items-center justify-center"
-       
       >
         <Layer>
           <ImageContainer
@@ -37,23 +36,42 @@ const AnnotationContainer = ({
             setHeight={setHeight}
           />
           {annotations.map((annotation, index) => {
-            return (
-              <Reactangle
-                key={annotation.id}
-                count={index}
-                dragable={true}
-                shapeProps={annotation}
-                onChange={(shapeProps: Annotation) =>
-                  handleChangeShape(index, shapeProps)
-                }
-                isSelected={selectedAnnotation?.id === annotation.id}
-                onSelect={() => {
-                  setSelectedAnnotation(annotation);
-                }}
-                containerHeight={height}
-                containerWidth={width}
-              />
-            );
+            if (annotation.type === "circle") {
+              return (
+                <Circle
+                  key={annotation.id}
+                  count={index}
+                  dragable={true}
+                  shapeProps={annotation}
+                  onChange={(shapeProps: Annotation) =>
+                    handleChangeShape(index, shapeProps)
+                  }
+                  isSelected={selectedAnnotation?.id === annotation.id}
+                  onSelect={() => {
+                    setSelectedAnnotation(annotation);
+                  }}
+                  containerHeight={height}
+                  containerWidth={width}
+                />
+              );
+            } else if (annotation.type === "rectangle")
+              return (
+                <Reactangle
+                  key={annotation.id}
+                  count={index}
+                  dragable={true}
+                  shapeProps={annotation}
+                  onChange={(shapeProps: Annotation) =>
+                    handleChangeShape(index, shapeProps)
+                  }
+                  isSelected={selectedAnnotation?.id === annotation.id}
+                  onSelect={() => {
+                    setSelectedAnnotation(annotation);
+                  }}
+                  containerHeight={height}
+                  containerWidth={width}
+                />
+              );
           })}
         </Layer>
       </Stage>

@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Group, Rect, Text, Transformer } from "react-konva";
 import Konva from "konva";
 import type { KonvaEventObject } from "konva/lib/Node";
@@ -27,11 +27,18 @@ const Reactangle = ({
 }: Props) => {
   const shapeRef = useRef<Konva.Group>(null);
   const transformRef = useRef<Konva.Transformer>(null);
-
+  useEffect(() => {
+    if (isSelected && transformRef.current && shapeRef.current) {
+      transformRef.current.setNode(shapeRef.current);
+      transformRef.current?.getLayer()?.batchDraw();
+    }
+  }, [isSelected]);
   if (!shapeProps) return null;
 
   const pixelX = (shapeProps.x * containerWidth) / 100;
   const pixelY = (shapeProps.y * containerHeight) / 100;
+  const pixelWidth = (shapeProps.width * containerWidth) / 100;
+  const pixelHeight = (shapeProps.height * containerHeight) / 100;
 
   const handleDragEnd = (e: KonvaEventObject<DragEvent>) => {
     const newX = e.target.x();
@@ -59,22 +66,34 @@ const Reactangle = ({
   const handleTransformEnd = () => {
     const node = shapeRef.current;
     if (!node) return;
-
+  
     const scaleX = node.scaleX();
     const scaleY = node.scaleY();
-
+  
     node.scaleX(1);
     node.scaleY(1);
-
+  
+    // Calculate the new position and size in percentage
+    const newX = node.x();
+    const newY = node.y();
+    const newWidth = Math.max(5, node.width() * scaleX);
+    const newHeight = Math.max(5, node.height() * scaleY);
+  
+    const percentageX = (newX / containerWidth) * 100;
+    const percentageY = (newY / containerHeight) * 100;
+    const percentageWidth = (newWidth / containerWidth) * 100;
+    const percentageHeight = (newHeight / containerHeight) * 100;
+  
     onChange({
       ...shapeProps,
-      x: node.x(),
-      y: node.y(),
-      width: Math.max(5, node.width() * scaleX),
-      height: Math.max(5, node.height() * scaleY),
+      x: percentageX,
+      y: percentageY,
+      width: percentageWidth,
+      height: percentageHeight,
       rotation: node.rotation(),
     });
   };
+  
 
   return (
     <>
@@ -84,6 +103,9 @@ const Reactangle = ({
         {...shapeProps}
         x={pixelX}
         y={pixelY}
+        height={pixelHeight}
+        width={pixelWidth}
+
         onDragEnd={handleDragEnd}
         dragBoundFunc={handleDragBoundFunc}
         onTransformEnd={handleTransformEnd}

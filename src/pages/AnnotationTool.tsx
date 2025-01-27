@@ -23,11 +23,10 @@ const ImageAnnotationTool = () => {
     () => imageFile && URL.createObjectURL(imageFile),
     [imageFile]
   );
+  console.log(annotations,selectedAnnotation,"annotations");
 
   const handleChangeShape = useCallback(
     (index: number, shapeProps: Annotation) => {
-      // const annotation = annotations.filter((item, idx) => idx !== index);
-
       setAnnotations((prev) =>
         prev.map((item, idx) => {
           if (index !== idx) {
